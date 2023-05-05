@@ -10,7 +10,7 @@ For use with this [webui](https://github.com/AUTOMATIC1111/stable-diffusion-webu
 # Installation Guide
 Install from webui's Extensions tab.
 
-Extensions > Install from URL > Paste `https://github.com/Leodotpy/sd-pixel` > Install
+Extensions > Install from URL > Paste `https://github.com/Leodotpy/sd-pixel.git` > Install
 
 # Feature Comparison Examples
 
