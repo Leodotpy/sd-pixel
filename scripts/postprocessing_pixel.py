@@ -17,7 +17,6 @@ def downscale_image(img, scale):
 def palette_limit(img, palette_size=16):
     if palette_size > 1:
         img = img.quantize(colors=palette_size, dither=None)
-
     return img
 
 
@@ -28,7 +27,7 @@ def rescale_image(img, original_size):
     return scaled_img
 
 
-def monochrome(img, graylimit=155):
+def grayscalelimit(img, graylimit=155):
     # Convert the image to grayscale
     img_gray = img.convert('L')
 
@@ -58,6 +57,7 @@ class ScriptPostprocessingUpscale(scripts_postprocessing.ScriptPostprocessing):
         self.downscale.enabled = value
         self.palette_size.enabled = value
         self.graylimit.enabled = value
+        self.rescale.enabled = value
 
     def on_palette_size_change(self, value):
         if value > 0:
@@ -70,20 +70,22 @@ class ScriptPostprocessingUpscale(scripts_postprocessing.ScriptPostprocessing):
 
     def ui(self):
         with FormGroup() as form_group:
-
             # Pixelate and rescale
             with FormRow():
                 pixelate_cb = gr.Checkbox(label="Pixelate", value=False, on_change=self.on_pixelate_change,
-                                       hover_text="Enable or disable pixelation.")
-                self.rescale = gr.Checkbox(label="Rescale", value=False, hover_text="Enable or disable rescaling.")
+                                          hover_text="Enable or disable pixelation.")
+
+                self.rescale = gr.Checkbox(label="Rescale", value=False, enabled=False,
+                                           hover_text="Enable or disable rescaling.")
 
             with FormRow(visible=False) as downscale_row:
                 self.downscale = gr.Slider(label="Downscale", minimum=1, maximum=32, step=1, value=8, enabled=True,
                                            hover_text="Adjust the downscaling factor.")
             # Palette
             with FormRow():
-                palette_limit_cb = gr.Checkbox(label="Color Palette Limit", value=False, on_change=self.on_pixelate_change,
-                                       hover_text="Enable or disable palette limit.")
+                palette_limit_cb = gr.Checkbox(label="Color Palette Limit", value=False,
+                                               on_change=self.on_pixelate_change,
+                                               hover_text="Enable or disable palette limit.")
             with FormRow(visible=False) as palette_row:
                 self.palette_size = gr.Slider(label="Palette Size", minimum=0, maximum=256, step=1, value=1,
                                               enabled=True,
@@ -93,7 +95,7 @@ class ScriptPostprocessingUpscale(scripts_postprocessing.ScriptPostprocessing):
             # Graylimit
             with FormRow():
                 gray_limit_cb = gr.Checkbox(label="Gray Limit", value=False, on_change=self.on_pixelate_change,
-                                       hover_text="Enable or disable palette limit.")
+                                            hover_text="Enable or disable palette limit.")
                 with FormRow(visible=False) as graylimit_row:
                     self.graylimit = gr.Slider(label="Graylimit", minimum=0, maximum=255, step=1, value=0, enabled=True,
                                                on_change=self.on_graylimit_change,
@@ -134,19 +136,25 @@ class ScriptPostprocessingUpscale(scripts_postprocessing.ScriptPostprocessing):
                 palette_size, gray_limit_cb, graylimit):
 
         original_size = pp.image.size
+        applied_effects = ""
 
         if pixelate_cb and downscale > 1:
             pp.image = downscale_image(pp.image, downscale)
+            applied_effects += f"Downscale: {downscale}, "
 
         if palette_limit_cb and palette_size > 1:
             pp.image = palette_limit(pp.image, palette_size)
+            applied_effects += f"Color Palette Limit: {palette_size}, "
 
         if gray_limit_cb and graylimit > 0:
-            pp.image = monochrome(pp.image, graylimit)
+            pp.image = grayscalelimit(pp.image, graylimit)
+            applied_effects += f"Gray Limit: {graylimit}, "
 
         # Pass the original size and the image to the rescale_image function
-        if rescale:
+        if rescale and pixelate_cb:
             pp.image = rescale_image(pp.image, original_size)
+            applied_effects += f"rescale, "
 
-        print(f"Pixelate with downscale {downscale, palette_size, original_size}")
-
+        # Send debug message if effects applied
+        if len(applied_effects) > 2:
+            print(f"Pixelate with {applied_effects[:-2]}")
