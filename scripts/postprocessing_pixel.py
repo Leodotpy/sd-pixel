@@ -3,7 +3,6 @@ import numpy as np
 from PIL import Image
 from modules import scripts_postprocessing
 import gradio as gr
-
 from modules.ui_components import FormRow, FormColumn, FormGroup, ToolButton, FormHTML
 
 
@@ -69,7 +68,7 @@ class ScriptPostprocessingUpscale(scripts_postprocessing.ScriptPostprocessing):
         self.graylimit.enabled = value
 
     def ui(self):
-        with FormGroup() as form_group:
+        with FormGroup():
             # Pixelate and rescale
             with FormRow():
                 pixelate_cb = gr.Checkbox(label="Pixelate", value=False, on_change=self.on_pixelate_change,
