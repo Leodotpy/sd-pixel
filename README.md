@@ -14,7 +14,7 @@ Extensions > Install from URL > Paste `https://github.com/Leodotpy/sd-pixel.git`
 
 Or install via the extensions menu by searching for "Pixel".
 
-(Reboot the app completely if you run into issues loading the extension)
+(Restart the webui via the Extensions menu to load the extension. If you run into issues loading the extension, reboot the app completely)
 
 # Feature Comparison Examples
 
