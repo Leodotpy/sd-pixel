@@ -12,7 +12,9 @@ Install from webui's Extensions tab.
 
 Extensions > Install from URL > Paste `https://github.com/Leodotpy/sd-pixel.git` > Install
 
-(You may need to restart the webui once for the extension to load. This can also be done from the extensions page)
+Or install via the extensions menu by searching for "Pixel".
+
+(Reboot the app completely if you run into issues loading the extension)
 
 # Feature Comparison Examples
 
