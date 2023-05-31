@@ -134,25 +134,35 @@ class ScriptPostprocessingUpscale(scripts_postprocessing.ScriptPostprocessing):
                 palette_limit_cb,
                 palette_size, gray_limit_cb, graylimit):
 
-        original_size = pp.image.size
+        # if image is not RGBA, convert it to RGBA
+        if pp.image.mode != 'RGBA':
+            img = pp.image.convert('RGBA')
+
+        else:
+            img = pp.image
+
+        original_size = img.size
         applied_effects = ""
 
         if pixelate_cb and downscale > 1:
-            pp.image = downscale_image(pp.image, downscale)
+            img = downscale_image(img, downscale)
             applied_effects += f"Downscale: {downscale}, "
 
         if palette_limit_cb and palette_size > 1:
-            pp.image = palette_limit(pp.image, palette_size)
+            img = palette_limit(img, palette_size)
             applied_effects += f"Color Palette Limit: {palette_size}, "
 
         if gray_limit_cb and graylimit > 0:
-            pp.image = grayscalelimit(pp.image, graylimit)
+            img = grayscalelimit(img, graylimit)
             applied_effects += f"Gray Limit: {graylimit}, "
 
         # Pass the original size and the image to the rescale_image function
         if rescale and pixelate_cb:
-            pp.image = rescale_image(pp.image, original_size)
+            img = rescale_image(img, original_size)
             applied_effects += f"rescale, "
+
+        # Convert back to original mode
+        pp.image = img.convert(pp.image.mode)
 
         # Send debug message if effects applied
         if len(applied_effects) > 2:
