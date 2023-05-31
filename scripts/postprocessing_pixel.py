@@ -40,7 +40,8 @@ def grayscalelimit(img, graylimit=155):
     # Loop through each pixel in the grayscale image
     for x in range(img_gray.width):
         for y in range(img_gray.height):
-            # If the grayscale pixel is less than or equal to 128, set the corresponding pixel in the black and white image to black
+            # If the grayscale pixel is less than or equal to 128,
+            # set the corresponding pixel in the black and white image to black
             if pixels_gray[x, y] <= graylimit:
                 pixels_bw[x, y] = 0
 
@@ -52,53 +53,36 @@ class ScriptPostprocessingUpscale(scripts_postprocessing.ScriptPostprocessing):
     order = 20000
     model = None
 
-    def on_pixelate_change(self, value):
-        self.downscale.enabled = value
-        self.palette_size.enabled = value
-        self.graylimit.enabled = value
-        self.rescale.enabled = value
-
-    def on_palette_size_change(self, value):
-        if value > 0:
-            self.palette_size.enabled = value
-        else:
-            self.palette_size.enabled = False
-
-    def on_graylimit_change(self, value):
-        self.graylimit.enabled = value
-
     def ui(self):
         with FormGroup():
             # Pixelate and rescale
             with FormRow():
-                pixelate_cb = gr.Checkbox(label="Pixelate", value=False, on_change=self.on_pixelate_change,
-                                          hover_text="Enable or disable pixelation.")
+                # Enable or disable pixelation
+                pixelate_cb = gr.Checkbox(label="Pixelate", value=False)
 
-                self.rescale = gr.Checkbox(label="Rescale", value=False, enabled=False,
-                                           hover_text="Enable or disable rescaling.")
+                # Enable or disable rescaling
+                rescale = gr.Checkbox(label="Rescale", value=False)
 
+            # Downscale
             with FormRow(visible=False) as downscale_row:
-                self.downscale = gr.Slider(label="Downscale", minimum=1, maximum=32, step=1, value=8, enabled=True,
-                                           hover_text="Adjust the downscaling factor.")
+                # Adjust the downscaling factor
+                downscale = gr.Slider(label="Downscale", minimum=1, maximum=32, step=1, value=8)
+
             # Palette
             with FormRow():
-                palette_limit_cb = gr.Checkbox(label="Color Palette Limit", value=False,
-                                               on_change=self.on_pixelate_change,
-                                               hover_text="Enable or disable palette limit.")
+                # Enable or disable palette limit
+                palette_limit_cb = gr.Checkbox(label="Color Palette Limit", value=False)
             with FormRow(visible=False) as palette_row:
-                self.palette_size = gr.Slider(label="Palette Size", minimum=0, maximum=256, step=1, value=1,
-                                              enabled=True,
-                                              on_change=self.on_palette_size_change,
-                                              hover_text="Adjust the palette size.")
+                # Adjust the palette size
+                palette_size = gr.Slider(label="Palette Size", minimum=0, maximum=256, step=1, value=1)
 
             # Graylimit
             with FormRow():
-                gray_limit_cb = gr.Checkbox(label="Gray Limit", value=False, on_change=self.on_pixelate_change,
-                                            hover_text="Enable or disable palette limit.")
-                with FormRow(visible=False) as graylimit_row:
-                    self.graylimit = gr.Slider(label="Graylimit", minimum=0, maximum=255, step=1, value=0, enabled=True,
-                                               on_change=self.on_graylimit_change,
-                                               hover_text="Adjust the graylimit value.")
+                # Enable or disable gray thresholding
+                gray_threshold_cb = gr.Checkbox(label="Gray Thresholding", value=False)
+                with FormRow(visible=False) as gray_threshold_row:
+                    # Adjust the graylimit value
+                    gray_threshold = gr.Slider(label="Threshold", minimum=0, maximum=255, step=1, value=0)
 
                 pixelate_cb.change(
                     fn=lambda x: gr.update(visible=x),
@@ -112,22 +96,22 @@ class ScriptPostprocessingUpscale(scripts_postprocessing.ScriptPostprocessing):
                     outputs=[palette_row],
                 )
 
-                gray_limit_cb.change(
+                gray_threshold_cb.change(
                     fn=lambda x: gr.update(visible=x),
-                    inputs=[gray_limit_cb],
-                    outputs=[graylimit_row],
+                    inputs=[gray_threshold_cb],
+                    outputs=[gray_threshold_row],
                 )
 
             return {
                 "pixelate_cb": pixelate_cb,
-                "rescale": self.rescale,
-                "downscale": self.downscale,
+                "rescale": rescale,
+                "downscale": downscale,
 
                 "palette_limit_cb": palette_limit_cb,
-                "palette_size": self.palette_size,
+                "palette_size": palette_size,
 
-                "gray_limit_cb": gray_limit_cb,
-                "graylimit": self.graylimit,
+                "gray_limit_cb": gray_threshold_cb,
+                "graylimit": gray_threshold,
             }
 
     def process(self, pp: scripts_postprocessing.PostprocessedImage, pixelate_cb, rescale, downscale,
@@ -137,7 +121,6 @@ class ScriptPostprocessingUpscale(scripts_postprocessing.ScriptPostprocessing):
         # if image is not RGBA, convert it to RGBA
         if pp.image.mode != 'RGBA':
             img = pp.image.convert('RGBA')
-
         else:
             img = pp.image
 
