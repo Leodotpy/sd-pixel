@@ -1,4 +1,4 @@
-# Pixel
+# Pixel 
 Adds various useful tools for pixel art to the Extras tab.
 
 ### Purpose
@@ -18,12 +18,20 @@ Or install via the extensions menu by searching for "Pixel".
 
 # Feature Comparison Examples
 
-| Effect  | Before | After |
-|---------|--------|-------|
-| Downscale | ![](examples/before-downscale2.png) | ![](examples/after-downscale2.png) |
-| Color Palette Limit | ![](examples/before-palette.png) | ![](examples/after-palette.png) |
-| Gray Limit | ![](examples/before-gray.png) | ![bad apple](examples/after-gray.png) |
+| Effect              | Before                              | After                                 |
+|---------------------|-------------------------------------|---------------------------------------|
+| Downscale           | ![](examples/before-downscale2.png) | ![](examples/after-downscale2.png)    |
+| Color Palette Limit | ![](examples/before-palette.png)    | ![](examples/after-palette.png)       |
+| Gray Limit          | ![](examples/before-gray.png)       | ![bad apple](examples/after-gray.png) |
+
+### Supported Downscaling Modes
+
+| *Original*                            |  | Nearest                           | Bicubic                           | Bilinear                           | Hamming                           | Lanczos                           |
+|---------------------------------------|--|-----------------------------------|-----------------------------------|------------------------------------|-----------------------------------|-----------------------------------|
+| <img src="examples/before-mode.jpeg"> |  | <img src="examples/Nearest.jpeg"> | <img src="examples/Bicubic.jpeg"> | <img src="examples/Bilinear.jpeg"> | <img src="examples/Hamming.jpeg"> | <img src="examples/Lanczos.jpeg"> |
 
 
-# Credits
+
+### Credits
 * Thanks AUTOMATIC1111 for an awesome sd webui
+

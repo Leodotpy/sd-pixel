@@ -5,11 +5,17 @@ from modules import scripts_postprocessing
 import gradio as gr
 from modules.ui_components import FormRow, FormColumn, FormGroup, ToolButton, FormHTML
 
+mode_dict = {"Nearest": Image.NEAREST,
+             "Bicubic": Image.BICUBIC,
+             "Bilinear": Image.BILINEAR,
+             "Hamming": Image.HAMMING,
+             "Lanczos": Image.LANCZOS}
 
-def downscale_image(img, scale):
+
+def downscale_image(img, scale, mode):
     width, height = img.size
     img = img.resize(
-        (int(width / scale), int(height / scale)), Image.NEAREST)
+        (int(width / scale), int(height / scale)), mode_dict[str(mode)])
     return img
 
 
@@ -67,6 +73,8 @@ class ScriptPostprocessingUpscale(scripts_postprocessing.ScriptPostprocessing):
             with FormRow(visible=False) as downscale_row:
                 # Adjust the downscaling factor
                 downscale = gr.Slider(label="Downscale", minimum=1, maximum=32, step=1, value=8)
+                # Select downscaling mode
+                mode = gr.Dropdown(label="Mode", choices=list(mode_dict.keys()), value=list(mode_dict.keys())[0], multiselect=False)
 
             # Palette
             with FormRow():
@@ -106,6 +114,7 @@ class ScriptPostprocessingUpscale(scripts_postprocessing.ScriptPostprocessing):
                 "pixelate_cb": pixelate_cb,
                 "rescale": rescale,
                 "downscale": downscale,
+                "mode": mode,
 
                 "palette_limit_cb": palette_limit_cb,
                 "palette_size": palette_size,
@@ -114,7 +123,7 @@ class ScriptPostprocessingUpscale(scripts_postprocessing.ScriptPostprocessing):
                 "graylimit": gray_threshold,
             }
 
-    def process(self, pp: scripts_postprocessing.PostprocessedImage, pixelate_cb, rescale, downscale,
+    def process(self, pp: scripts_postprocessing.PostprocessedImage, pixelate_cb, rescale, downscale, mode,
                 palette_limit_cb,
                 palette_size, gray_limit_cb, graylimit):
 
@@ -128,8 +137,8 @@ class ScriptPostprocessingUpscale(scripts_postprocessing.ScriptPostprocessing):
         applied_effects = ""
 
         if pixelate_cb and downscale > 1:
-            img = downscale_image(img, downscale)
-            applied_effects += f"Downscale: {downscale}, "
+            img = downscale_image(img, downscale, mode)
+            applied_effects += f"Downscale: {downscale}, Mode: {mode}, "
 
         if palette_limit_cb and palette_size > 1:
             img = palette_limit(img, palette_size)
